@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import * as THREE from '../vendor/modern/three.module.js';
+import {createVehicleDriver,updateVehicleCamera} from '../vehicle-driving.js';
+const car=new THREE.Group();car.userData.size={width:2,height:1.4,length:4.8};const driver=createVehicleDriver(car);
+for(let i=0;i<60;i++)driver.update(1/60,{throttle:1});
+assert.ok(driver.speed>5.9&&car.position.z<-2.9,'Throttle accelerates the car forward');
+const heading=car.rotation.y;driver.update(.5,{throttle:1,steer:1});assert.ok(car.rotation.y<heading,'Right steering turns the car right');
+for(let i=0;i<120;i++)driver.update(1/60,{brake:true});assert.equal(driver.speed,0,'Brake comes to a complete stop');
+driver.reset();for(let i=0;i<120;i++)driver.update(1/60,{throttle:-.7,steer:.5});assert.ok(driver.speed<0&&car.position.z>0,'Analog joystick input supports reverse');assert.ok(car.rotation.y>0,'Steering reverses naturally when backing up');
+driver.reset();for(let i=0;i<600;i++)driver.update(1/60,{throttle:1,bounds:{minX:-12,maxX:12,minZ:-12,maxZ:12}});assert.ok(car.position.z>=-9.6,'Car stays inside the driving area with room for its body');assert.equal(driver.speed,0);
+driver.reset();assert.equal(car.position.length(),0);assert.equal(car.rotation.y,0);
+for(let i=0;i<120;i++)driver.update(1/60,{throttle:1});driver.stop();assert.equal(driver.speed,0);
+const camera=new THREE.PerspectiveCamera();car.position.set(4,0,2);car.rotation.y=Math.PI/2;
+updateVehicleCamera(camera,driver,0,{instant:true});assert.ok(camera.position.x>car.position.x&&camera.position.y>2,'Camera is above and behind the car');assert.equal(camera.fov,60);
+const forward=new THREE.Vector3(-Math.sin(car.rotation.y),0,-Math.cos(car.rotation.y));assert.ok(camera.position.clone().sub(car.position).dot(forward)<0,'Chase camera follows behind the vehicle heading');
+const simulate=dt=>{const model=new THREE.Group();model.userData.size=car.userData.size;const d=createVehicleDriver(model);for(let elapsed=0;elapsed<2-1e-6;elapsed+=dt)d.update(dt,{throttle:1,steer:.2});return model;};
+assert.ok(simulate(1/30).position.distanceTo(simulate(1/60).position)<1e-6,'Driving remains consistent at 30 and 60 FPS');
+console.log('PASS: acceleration, steering, braking, analog reverse, scene bounds, reset, chase camera and frame-rate consistency.');

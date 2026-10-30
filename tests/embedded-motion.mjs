@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import * as THREE from '../vendor/modern/three.module.js';
+import {createCharacterMotion} from '../character-motion.js';
+const root=new THREE.Group(),bone=new THREE.Bone();bone.name='Test bone';root.add(bone);
+const clip=new THREE.AnimationClip('Trot',1,[new THREE.VectorKeyframeTrack(bone.uuid+'.position',[0,1],[0,0,0,1,0,0])]);
+const motion=createCharacterMotion(root,{clips:[clip],clipSettings:{Trot:{mode:'loop',locomotion:true,speed:.8}}});
+assert.equal(motion.preset.mode,'loop');assert.equal(motion.movementSpeed,.8);
+motion.update(.5,{playing:true,moving:false});assert.equal(bone.position.x,0,'locomotion waits for movement');
+motion.update(.5,{playing:true,moving:true});assert.ok(bone.position.x>.4&&bone.position.x<.6);
+motion.trigger();assert.equal(motion.enabled,false);assert.equal(bone.position.x,0);
+const legacy=createCharacterMotion(root,{clips:[clip]});assert.equal(legacy.preset.mode,'once','existing embark/action defaults stay once');assert.equal(legacy.movementSpeed,1);
+legacy.trigger();legacy.update(1.1);assert.equal(legacy.oneShot,false);
+console.log('PASS: embedded clip loop settings, locomotion gating, speed, toggle and existing once defaults.');
