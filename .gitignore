@@ -1,0 +1,17 @@
+# Extracted game assets are yours to use locally — but they are not yours to
+# redistribute, so the repo is set up to keep them out of git by default.
+# If you create your OWN original models, force-add them explicitly.
+assets/
+data/*
+!data/library.json
+
+# Generated environment models (regenerate with blender/generate_environments.py)
+environments/*.glb
+environments/layouts.json
+
+# Tooling scratch
+tools/python-deps/
+tools/**/__pycache__/
+*.log
+.DS_Store
+Thumbs.db
