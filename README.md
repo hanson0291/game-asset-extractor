@@ -27,6 +27,46 @@ expected — see "Extract your own assets".
 provides the library API, byte-range audio seeking, and multiplayer, so it's
 the recommended way to run it.)
 
+## Recommended: use it with Tailscale
+
+The server binds to `127.0.0.1` on purpose — your extracted assets never
+leave the PC unless you say so. The catch is that only that PC can open the
+app, which rules out your phone, a tablet, or a second computer joining a
+multiplayer session. [Tailscale](https://tailscale.com) is the recommended
+way to bridge that gap: it's a free-for-personal-use private network
+(WireGuard under the hood), and its **Serve** feature fronts the loopback
+server with a real HTTPS address that only your own devices can reach.
+
+1. Install Tailscale on the PC running the server and on each device you
+   want to use, and sign all of them into the same tailnet. (First time
+   only: enable MagicDNS and HTTPS certificates in the Tailscale admin
+   console.)
+2. With `node server.cjs` running, publish it to your tailnet:
+
+   ```sh
+   tailscale serve --bg http://127.0.0.1:5187
+   ```
+
+3. Open `https://<machine>.<tailnet>.ts.net` — the address Serve prints,
+   e.g. `https://my-pc.tail1234.ts.net` — from any device on the tailnet.
+
+Why this setup:
+
+- **Your assets stay private.** Nothing is exposed to the public internet
+  or even your LAN — only devices signed into your tailnet can connect,
+  and traffic is end-to-end encrypted. Leave the server bound to
+  `127.0.0.1`; do **not** switch it to `0.0.0.0`, forward a router port, or
+  use Tailscale Funnel (Funnel is the public-internet option — the wrong
+  tool here).
+- **Proper HTTPS.** Browsers gate fullscreen, gamepads, and some WebGL
+  behaviour behind secure contexts; the `*.ts.net` address has a real
+  certificate, so Play mode works from a phone exactly as it does locally.
+- **Multiplayer just works.** Host and guest both open the same `*.ts.net`
+  address and use the room code — no port forwarding, no firewall rules.
+
+Run `tailscale serve status` to see what's published, and
+`tailscale serve reset` to stop sharing.
+
 ## What you get
 
 - **Character library** (`index.html`) — organize extracted characters by
