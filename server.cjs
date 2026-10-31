@@ -6,14 +6,14 @@
 // session-server.cjs). Node built-ins only — no npm install:
 //
 //   node server.cjs
-//   -> http://127.0.0.1:5186/
+//   -> http://127.0.0.1:5187/
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const sessions = require('./session-server.cjs');
 
 const root = __dirname;
-const PORT = 5186;
+const PORT = 5187;
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json', '.glb': 'model/gltf-binary', '.gltf': 'model/gltf+json', '.bin': 'application/octet-stream', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.wav': 'audio/wav', '.ogg': 'audio/ogg', '.mp3': 'audio/mpeg', '.m4a': 'audio/mp4' };
 
 // ---- Library API -------------------------------------------------------------

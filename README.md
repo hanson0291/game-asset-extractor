@@ -19,7 +19,7 @@ Requires [Node.js](https://nodejs.org) 18+ (no npm install — built-ins only).
 node server.cjs
 ```
 
-Then open **http://127.0.0.1:5186/**. On Windows you can double-click
+Then open **http://127.0.0.1:5187/**. On Windows you can double-click
 `start.cmd` instead. Fresh out of the box the library is empty; that's
 expected — see "Extract your own assets".
 
